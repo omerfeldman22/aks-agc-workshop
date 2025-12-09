@@ -147,6 +147,35 @@ After the infrastructure deployment, you need to manually activate the wildcard 
 
 **Note**: Domain verification can take up to 48 hours, but typically completes within a few minutes to a few hours.
 
+### 3. Deploy Application Resources
+
+After the infrastructure is deployed and the certificate is activated:
+
+1. Navigate to the application directory:
+   ```bash
+   cd ../app
+   ```
+
+2. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+
+3. Apply the configuration:
+   ```bash
+   terraform apply -var-file="../terraform.tfvars" -auto-approve
+   ```
+
+This deploys:
+- **Sample Applications** - Two demo applications (app1 and app2)
+- **Application Gateway for Containers (AGC)** - Including ALB Controller
+- **Gateway Resource** - Pre-configured Gateway with HTTP and HTTPS listeners
+- **TLS Certificate Secret** - Automatically converted from Key Vault PFX to Kubernetes format
+- **ReferenceGrants** - Allowing HTTPRoutes to reference services across namespaces
+- **ExternalDNS** - Automated DNS record management
+
+After deployment, the Gateway will be ready for HTTPRoute configurations in the workshop steps.
+
 ## What Gets Deployed
 
 This Terraform configuration creates:
@@ -157,21 +186,37 @@ This Terraform configuration creates:
   - CNI Overlay networking mode
   - Cilium network data plane
   - System and User node pools
-- **Virtual Network** - Network infrastructure with dedicated AKS subnet
+- **Virtual Network** - Network infrastructure with dedicated AKS and AGC subnets
 - **Network Security Group** - With HTTP/HTTPS traffic rules
 - **App Service Domain** - Public .com domain registration
 - **DNS Zone** - DNS management for the domain
 - **App Service Certificate Order** - Wildcard SSL certificate (`*.yourdomain.com`)
 - **Azure Key Vault** - Secure certificate storage and validation
 
+**Application Resources (`IaC/app`)**:
+- **Application Gateway for Containers (AGC)** - Azure's next-generation load balancer
+- **ALB Controller** - Manages AGC resources via Gateway API
+- **Gateway** - Pre-configured with HTTP (80) and HTTPS (443) listeners
+- **Sample Applications** - Two demo apps (app1, app2) with services
+- **TLS Certificate** - Auto-converted from PFX to Kubernetes TLS secret format
+- **ReferenceGrants** - Cross-namespace service access permissions
+- **ExternalDNS** - Automated DNS record creation for Ingress/Gateway resources
+
 ## Clean Up
 
 To destroy all created resources:
 
-```bash
-cd IaC/infra
-terraform destroy -var-file="../terraform.tfvars"
-```
+1. Destroy application resources first:
+   ```bash
+   cd IaC/app
+   terraform destroy -var-file="../terraform.tfvars" -auto-approve
+   ```
+
+2. Then destroy infrastructure:
+   ```bash
+   cd ../infra
+   terraform destroy -var-file="../terraform.tfvars" -auto-approve
+   ```
 
 ⚠️ **Warning**: This will permanently delete all resources created by this configuration, including the registered domain and certificate.
 
@@ -212,12 +257,4 @@ This configuration uses:
 
 After infrastructure deployment and certificate activation:
 
-1. Deploy application workloads to AKS
-2. Configure Application Gateway for Containers
-3. Follow the workshop instructions for AGC capabilities demonstration
-
-## Additional Resources
-
-- [Azure Application Gateway for Containers Documentation](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/overview)
-- [AKS CNI Overlay Documentation](https://learn.microsoft.com/en-us/azure/aks/azure-cni-overlay)
-- [Cilium Network Policies](https://docs.cilium.io/en/stable/network/kubernetes/policy/)
+1. Follow the workshop steps
