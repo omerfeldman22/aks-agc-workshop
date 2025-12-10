@@ -1,0 +1,37 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: header-based-httproute
+  namespace: app-networking
+spec:
+  parentRefs:
+  - name: app-gateway
+    namespace: app-networking
+    sectionName: https-listener
+  hostnames:
+  - "header.your-domain.com"
+  rules:
+  # Header-based routing: /header with X-Version: beta header routes to app2
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+      headers:
+      - name: X-Version
+        value: beta
+    backendRefs:
+    - name: app2
+      namespace: app2
+      port: 80
+  # Header-based routing fallback: /header without header routes to app1
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: app1
+      namespace: app1
+      port: 80
+
+
+# Can be tested with the command: curl -k -s -H "X-Version: beta" https://header.your-domain.com/

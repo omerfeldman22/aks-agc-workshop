@@ -47,6 +47,14 @@ resource "azurerm_role_assignment" "alb_controller_network_contributor" {
   principal_id         = azurerm_user_assigned_identity.alb_controller.principal_id
 }
 
+# Assign Contributor role to ALB Controller on the resource group for WAF policies
+# This allows the controller to join/use any WAF policy in the resource group
+resource "azurerm_role_assignment" "alb_controller_waf_contributor" {
+  scope                = data.azurerm_resource_group.rg.id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_user_assigned_identity.alb_controller.principal_id
+}
+
 # Install ALB Controller using Helm
 resource "helm_release" "alb_controller" {
   name             = "alb-controller"
@@ -70,7 +78,8 @@ resource "helm_release" "alb_controller" {
     azurerm_federated_identity_credential.alb_controller,
     azurerm_role_assignment.alb_controller_reader,
     azurerm_role_assignment.alb_controller_appgw_config_manager,
-    azurerm_role_assignment.alb_controller_network_contributor
+    azurerm_role_assignment.alb_controller_network_contributor,
+    azurerm_role_assignment.alb_controller_waf_contributor
   ]
 }
 

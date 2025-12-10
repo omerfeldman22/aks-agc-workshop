@@ -9,8 +9,8 @@ spec:
     namespace: app-networking
     sectionName: http-listener
   hostnames:
-  - "app1.omerfagc-01.com"
-  - "app2.omerfagc-01.com"
+  - "app1.your-domain.com"
+  - "app2.your-domain.com"
   rules:
   - matches:
     - path:

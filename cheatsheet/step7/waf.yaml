@@ -1,0 +1,13 @@
+apiVersion: alb.networking.azure.io/v1
+kind: WebApplicationFirewallPolicy
+metadata:
+  name: waf-policy1
+  namespace: app-networking
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: sticky-based-httproute
+    namespace: app-networking
+  webApplicationFirewall:
+    id: /subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_RESOURCE_GROUP/providers/Microsoft.Network/applicationGatewayWebApplicationFirewallPolicies/YOUR_WAF_NAME

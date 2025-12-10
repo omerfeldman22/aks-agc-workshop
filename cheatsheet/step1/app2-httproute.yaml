@@ -7,9 +7,9 @@ spec:
   parentRefs:
   - name: app-gateway
     namespace: app-networking
-    sectionName: https-listener
+    sectionName: http-listener
   hostnames:
-  - "app2.omerfagc-01.com"
+  - "app2.your-domain.com"
   rules:
   - matches:
     - path:

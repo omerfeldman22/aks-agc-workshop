@@ -1,0 +1,29 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: weighted-based-httproute
+  namespace: app-networking
+spec:
+  parentRefs:
+  - name: app-gateway
+    namespace: app-networking
+    sectionName: https-listener
+  hostnames:
+  - "weighted.your-domain.com"
+  rules:
+  # Weighted traffic distribution: splits traffic 80% app1, 20% app2
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: app1
+      namespace: app1
+      port: 80
+      weight: 80
+    - name: app2
+      namespace: app2
+      port: 80
+      weight: 20
+
+# count_app1=0; count_app2=0; for i in $(seq 1 100); do response=$(curl -k -s https://weighted.your-domain.com/); if [[ $response == *"app1"* ]]; then ((count_app1++)); else ((count_app2++)); fi; done; echo "=== Weighted distribution results (100 requests) ==="; echo "app1: $count_app1 requests ($(( count_app1 ))%) should be aproximatly 80%"; echo "app2: $count_app2 requests ($(( count_app2 ))%) should be aproximatly 20%"

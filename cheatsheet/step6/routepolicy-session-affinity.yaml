@@ -1,0 +1,18 @@
+# RoutePolicy for session affinity (sticky sessions)
+# This makes requests from the same client always go to the same backend pod
+apiVersion: alb.networking.azure.io/v1
+kind: RoutePolicy
+metadata:
+  name: session-affinity-route-policy
+  namespace: app-networking
+spec:
+  targetRef:
+    kind: HTTPRoute
+    name: sticky-based-httproute
+    namespace: app-networking
+    group: "gateway.networking.k8s.io"
+  default:
+    sessionAffinity:
+      affinityType: "application-cookie"
+      cookieName: "app-cookie"
+      cookieDuration: 3600s  # 1 hour
