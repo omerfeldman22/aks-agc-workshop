@@ -1,0 +1,13 @@
+apiVersion: alb.networking.azure.io/v1
+kind: WebApplicationFirewallPolicy
+metadata:
+  name: path-based-waf-policy
+  namespace: app-networking
+spec:
+  targetRef:
+    group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: your-path-based-httproute-name
+    namespace: app-networking
+  webApplicationFirewall:
+    id: <APPLICATION_GATEWAY_WAF_RESOURCE_ID>

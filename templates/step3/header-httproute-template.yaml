@@ -1,0 +1,40 @@
+# HTTPRoute configuration demonstrating header-based routing
+# This example shows how to route traffic based on HTTP headers
+# Routes with specific header values go to different backend services
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: your-route-name
+  namespace: app-networking
+spec:
+  parentRefs:
+  - name: app-gateway
+    namespace: app-networking
+    sectionName: https-listener
+  hostnames:
+  - "header.your-domain.com"
+  rules:
+  # Route 1: Match requests with specific header value
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+      headers:
+      - name: your-header-name
+        value: your-header-value
+    backendRefs:
+    - name: your-service-name
+      namespace: your-service-namespace
+      port: 80
+  # Route 2: Default route for requests without the header (fallback)
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: your-service-name
+      namespace: your-service-namespace
+      port: 80
+
+# Test command example:
+# curl -k -H "your-header-name: your-header-value" https://header.your-domain.com/

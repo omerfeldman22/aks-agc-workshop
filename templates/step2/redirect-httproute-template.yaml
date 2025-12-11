@@ -1,0 +1,23 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: redirect-route-name
+  namespace: app-networking
+spec:
+  parentRefs:
+  - name: app-gateway
+    namespace: app-networking
+    sectionName: http-listener
+  hostnames:
+  - "app1.your-domain.com"
+  - "app2.your-domain.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: https
+        statusCode: 301
